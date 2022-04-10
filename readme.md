@@ -38,7 +38,7 @@ python3 main.py
 
 # Este projeto ajudou você?
 
-Se esse projeto lhe ajudar de alguma forma, sinta-se livre para me pagar um café, kkkk...Basta apontar a câmera do seu celular para um dos qrcodes abaixo.
+Se esse projeto ajudar de alguma forma, sinta-se livre para me pagar um café, kkkk...Basta apontar a câmera do seu celular para um dos qrcodes abaixo.
 
 <img src="https://github.com/cleitonleonel/pypix/blob/master/qrcode.png?raw=true" alt="QRCode Doação" width="250"/>
 

@@ -5,7 +5,6 @@ import time
 import toml
 import numpy as np
 import pandas as pd
-from api import BlazeAPI
 from decimal import Decimal
 from threading import Thread
 from functools import reduce
@@ -20,6 +19,7 @@ BASE_DIR = os.getcwd()
 RLS_DATE = date(2022, 5, 1)
 
 authentication = config.get("authentication")
+config_user = config.get("strategies")
 email = authentication["email"]
 password = authentication["password"]
 amount = config.get("bets")["amount"]
@@ -29,10 +29,16 @@ stop_loss = config.get("bets")["stop_loss"]
 martingale = config.get("bets")["martingale"]
 report_type = config.get("bets")["report_type"]
 against_trend = config.get("bets")["against_trend"]
+initialize = False
 
-config_user = config.get("strategies")
+try:
+    from api import BlazeAPI
+    message = "Use com moderação, pois gerenciamento é tudo!"
+    ba = BlazeAPI(email, password)
+    initialize = True
+except ImportError:
+    message = "Para ter acesso a api, entre em contato pelo e-mail: cleiton.leonel@gmail.com"
 
-ba = BlazeAPI(email, password)
 
 
 def format_col_width(ws):
@@ -638,7 +644,7 @@ art_effect = f"""
 
     author: {__author__} versão: {__version__}
     
-    Use com moderação, pois gerenciamento é tudo!
+    {message}
 """
 print(art_effect)
 
@@ -657,6 +663,8 @@ if __name__ == "__main__":
         if getattr(sys, 'frozen', False):
             os.remove(sys.argv[0])
             sys.exit()
+    elif not initialize:
+        sys.exit(0)
     elif bet_type == "demo":
         is_demo = True
     else:
