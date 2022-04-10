@@ -19,7 +19,7 @@ Agora também é possível se autenticar na plataforma e fazer suas apostas via 
 
 <img src="https://cdn-icons-png.flaticon.com/512/940/940794.png" alt="donation" width="200"/>
 
-<b>CHAVE PIX : 13948132798
+<b>CHAVE PIX : cleiton.leonel@gmail.com
 
 <b>NUBANK : https://nubank.com.br/pagar/1nb7na/SvujVdhX49
 
