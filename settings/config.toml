@@ -1,0 +1,82 @@
+title = "Blazebot TOML Config"
+
+[project]
+name = "Blazebot"
+description = "Apostas automáticas na plataforma blaze.com"
+version = "0.0.1-beta"
+author = "Cleiton Leonel Creton"
+
+[authentication]
+email = "test123@gmail.com"
+password = "test123"
+
+[bets]
+# valor da entrada
+amount = 2.00
+# quantidade de martingale
+martingale = 2
+# limite de perdas
+stop_loss = 20
+# limite de ganhos
+stop_gain = 40
+# seguir tendência
+against_trend = 0  # 0 para não seguir a tendência ou 1 para seguir a tendência
+# tipo de aposta
+bet_type = "demo"  # demo ou real
+# define o tipo de arquivo para os relatórios
+report_type = "excel"  # excel, csv ou json
+
+
+[strategies]
+  #Por padrão a estratégia de usuário está desabilitada,
+  #Para habilitar mude o status para enable.
+  status = "disable"  # "enable" # disable
+
+  [strategies.sequencies]
+    status = "enable"  # "enable" # disable
+
+    [strategies.sequencies.simple]
+      #Estratégia de sequência simples:
+      #Deve-se definir aqui a quantidade de cores
+      #repetidas em sequência que deseja analisar.
+      #EXEMPLOS:
+      #[preto, preto, preto, ...] = vermelho
+      #[vermelho, vermelho, vermelho, ...] = preto
+      status = "enable"  # "enable" # disable
+      black = 3
+      red = 3
+      white = 0
+
+    [strategies.sequencies.alternate]
+      #Estratégia de sequência alternada:
+      #Deve-se definir aqui a quantidade de cores repetidas
+      #alternadamente que deseja analisar.
+      #EXEMPLOS:
+      #[preto, vermelho, ...] = preto
+      #[vermelho, preto, ...] = vermelho
+      #[vermelho, vermelho, preto, preto, ...] = [vermelho, vermelho]
+      status = "enable"  # "enable" # disable
+      black = 1
+      red = 1
+      white = 0
+
+    [strategies.sequencies.repeat]
+      #Limite de vezes que uma cor pode se repetir
+      #numa sequência contínua até que a sequência
+      #seja quebrada por uma cor oposta, analisando
+      #a tendência e apostando em uma cor oposta ou
+      #mesmo no branco.
+      #EXEMPLO:
+      #[vermelho, vermelho, vermelho, vermelho, ...]
+      #Sequência acima de 6 cores espera-se que venha 1 branco nas
+      #próximas 2 rodadas, caso não venha dobrar a aposta no preto
+      limit = 7
+
+  [strategies.advanced]
+    status = "enable"  # "enable" # disable
+
+    [strategies.advanced.protection]
+      #Aplica uma estratégia de proteção a entrada corrente,
+      #mantendo o valor da primeira entrada, se der loss
+      #será aplicado martingale com base na primeira entrada.
+      hand = "reverse"  # "reverse" # "same"

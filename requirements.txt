@@ -1,0 +1,14 @@
+certifi==2021.10.8
+charset-normalizer==2.0.10
+gevent==21.12.0
+greenlet==1.1.2
+idna==3.3
+requests==2.27.1
+urllib3==1.26.8
+websocket-client==1.2.3
+zope.event==4.5.0
+zope.interface==5.4.0
+pandas~=1.4.1
+numpy~=1.22.2
+lxml~=4.7.1
+toml==0.10.2
