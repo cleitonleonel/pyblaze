@@ -3,7 +3,7 @@ title = "Blazebot TOML Config"
 [project]
 name = "Blazebot"
 description = "Apostas automáticas na plataforma blaze.com"
-version = "0.0.1-beta"
+version = "0.0.1-trial"
 author = "Cleiton Leonel Creton"
 
 [authentication]
@@ -25,6 +25,8 @@ against_trend = 0  # 0 para não seguir a tendência ou 1 para seguir a tendênc
 bet_type = "demo"  # demo ou real
 # define o tipo de arquivo para os relatórios
 report_type = "excel"  # excel, csv ou json
+# define o tempo de inatividade do bot após atingir um stop_loss ou stop_win
+sleep_bot = 3600  # 1 hora em segundos
 
 
 [strategies]
