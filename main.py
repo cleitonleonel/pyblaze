@@ -630,15 +630,15 @@ def start(demo, amount=2, stop_gain=None, stop_loss=None, martingale=None):
             if stop_gain and profit >= abs(stop_gain):
                 print("LIMITE DE GANHOS BATIDO, SAINDO...")
                 report_save(report_data)
-                if sleep_bot:
-                    time.sleep(sleep_bot["time"])
+                if sleep_bot > 0:
+                    time.sleep(sleep_bot)
                 else:
                     break
             elif stop_loss and profit <= float('-' + str(abs(stop_loss))):
                 print("LIMITE DE PERDAS BATIDO, SAINDO...")
                 report_save(report_data)
-                if sleep_bot:
-                    time.sleep(sleep_bot["time"])
+                if sleep_bot > 0:
+                    time.sleep(sleep_bot)
                 else:
                     break
             print(json.dumps(single_bet, indent=4))
