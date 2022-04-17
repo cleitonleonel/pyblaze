@@ -16,9 +16,11 @@ def get_color(number):
 
 
 def on_message(ws, message):
-    if "roulette.update" in message:
+    global length
+    if "double.tick" in message:
         data = json.loads(message[2:])[1]["payload"]
-        if data["status"] == "complete":
+        if data["status"] == "complete" and length != len(message) + 1:
+            length = len(message) + 1
             print(fr'Giro anterior {data["roll"]}, cor {get_color(data["color"])}')
 
         ws.send('2')
@@ -37,10 +39,10 @@ def on_open(ws):
 
     def run(*args):
         time.sleep(1)
-        message = '%d["cmd", {"id": "subscribe", "payload": {"room": "roulette"}}]' % 420
+        message = '%d["cmd", {"id": "subscribe", "payload": {"room": "double_v2"}}]' % 421
         ws.send(message)
         time.sleep(0.1)
-        message = '%d["cmd", {"id": "subscribe", "payload": {"room": "chat_room_2"}}]' % 421
+        message = '%d["cmd", {"id": "subscribe", "payload": {"room": "chat_room_2"}}]' % 422
         ws.send(message)
 
     _thread.start_new_thread(run, ())
@@ -48,7 +50,8 @@ def on_open(ws):
 
 if __name__ == "__main__":
     # websocket.enableTrace(True)
-
+    last_roll = None
+    length = 0
     ws = websocket.WebSocketApp(f"{WSS_BASE}/replication/?EIO=3&transport=websocket",
                                 on_open=on_open,
                                 on_message=on_message,
