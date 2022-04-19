@@ -22,7 +22,6 @@ def on_message(ws, message):
         if data["status"] == "complete" and length != len(message) + 1:
             length = len(message) + 1
             print(fr'Giro anterior {data["roll"]}, cor {get_color(data["color"])}')
-
         ws.send('2')
 
 
@@ -35,7 +34,6 @@ def on_close(ws, close_status_code, close_msg):
 
 
 def on_open(ws):
-    count_bet = 0
 
     def run(*args):
         time.sleep(1)
@@ -50,7 +48,6 @@ def on_open(ws):
 
 if __name__ == "__main__":
     # websocket.enableTrace(True)
-    last_roll = None
     length = 0
     ws = websocket.WebSocketApp(f"{WSS_BASE}/replication/?EIO=3&transport=websocket",
                                 on_open=on_open,
