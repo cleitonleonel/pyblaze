@@ -15,6 +15,9 @@ Agora também é possível se autenticar na plataforma e fazer suas apostas via 
 [![Gmail Badge](https://img.shields.io/badge/Gmail-D14836?style=for-the-badge&logo=gmail&logoColor=white&link=https://github.com/cleitonleonel)](cleiton.leonel@gmail.com)
 </h4>
 
+# _Testar a API_:
+Para testar a api e verificar a sua documentação acesse [_BlazeAPI_](https://github.com/cleitonleonel/blaze-api)
+
 # Precisa de um bot para telegram? uma sala de sinais crashs ou doubles? visite: [probots](https://webtelegram.com.br/)
 
 <img src="https://cdn-icons-png.flaticon.com/512/940/940794.png" alt="donation" width="200"/>
