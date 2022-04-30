@@ -73,20 +73,21 @@ def export_to_excel(file_name, data_frame, cols):
         writer.save()
 
 
-def report_save(data):
+def report_save(data, data_type, data_created):
+    filename = f"report-{data_type}-{data_created}"
     if report_type == "json":
-        with open(os.path.join("./", "report.json"), "w") as report_json:
+        with open(os.path.join("./", f"{filename}.json"), "w") as report_json:
             report_json.write(json.dumps(data, indent=4))
     elif report_type == "excel":
         cols = [list(item["object"].keys()) for item in data][0]
         rows = np.array([list(item["object"].values()) for item in data])
-        export_to_excel("report", rows, cols)
+        export_to_excel(f"{filename}", rows, cols)
     elif report_type == "csv":
         cols = [list(item["object"].keys()) for item in data][0]
         data_rows = {item: [list(item["object"].values())[index] for item in data]
                      for index, item in enumerate(cols)}
         df = pd.DataFrame(data_rows, columns=cols)
-        df.to_csv(r'report.csv', index=False, header=True)
+        df.to_csv(fr"{filename}", index=False, header=True)
 
 
 def get_color(number):
@@ -170,18 +171,18 @@ def fake_bets(color, amount=2, balance=100):
             result_bet["object"]["win"] = False
         if result_bet["object"]["win"]:
             print("\nWIN !!!\nVencemos na mão fixa moleque...\r")
-            balance += float(amount)
+            balance += float(amount * 2)
         if not result_protection["object"]["win"]:
             print("\nPUTS, DEU LOSS NA MÃO DE PROTEÇÃO...\r\nBora tentar de novo!!!\r")
             balance -= float(amount)
             result_bet["object"]["win"] = False
         if result_protection["object"]["win"]:
             print("\nWIN !!!\nVencemos na mão de proteção moleque...\r")
-            balance += float(amount)
+            balance += float(amount * 2)
     else:
         if result_bet["object"]["win"]:
             print("\nWIN !!!\nVencemos moleque...\r")
-            balance += float(amount)
+            balance += float(amount * 2)
         else:
             print("\nPUTS, DEU LOSS...\r\nBora tentar de novo!!!\r")
             balance -= float(amount)
@@ -463,6 +464,7 @@ def get_user_analises():
     sequence_alternate_status = config_user["sequencies"]["alternate"].get("status")
 
     if last_doubles:
+        print("\rPOSSÍVEL SEQUÊNCIA DETECTADA...\r")
         double = [[item["color"], item["value"]] for item in last_doubles["items"]]
         sequence = [color[0] for color in double[:sequence_limit]]
 
@@ -471,36 +473,26 @@ def get_user_analises():
             print("\rPOSSÍVEL BRANCO DETECTADO...\r")
             color = "branco"
 
-        elif sequence_simple_status == "enable":
-
+        if sequence_simple_status == "enable":
             colors_black = config_user["sequencies"]["simple"]["black"]
             colors_red = config_user["sequencies"]["simple"]["red"]
             colors_white = config_user["sequencies"]["simple"]["white"]
 
-            print("\rPOSSÍVEL SEQUÊNCIA DETECTADA...\r")
-
-            if [color[0] for color in double[:colors_white]].count("preto") == colors_white:
+            if [color[0] for color in double[:colors_white]].count("branco") == colors_white:
                 color = "vermelho"
             elif [color[0] for color in double[:colors_black]].count("preto") == colors_black:
                 color = "vermelho"
             elif [color[0] for color in double[:colors_red]].count("vermelho") == colors_red:
                 color = "preto"
-            else:
-                print("\rPOSSÍVEL BRANCO DETECTADO...\r")
-                color = "branco"
 
-        elif sequence_alternate_status == "enable":
-
+        if not color and sequence_alternate_status == "enable":
             colors_black = config_user["sequencies"]["alternate"]["black"]
             colors_red = config_user["sequencies"]["alternate"]["red"]
             colors_white = config_user["sequencies"]["alternate"]["white"]
 
             sequence_colors_size = colors_black + colors_red
 
-            # print([sequence[:sequence_colors_size]])
-            print("\rPOSSÍVEL SEQUÊNCIA DETECTADA...\r")
-
-            if [color[0] for color in double[:colors_white]].count("preto") == colors_white:
+            if [color[0] for color in double[:colors_white]].count("branco") == colors_white:
                 color = "vermelho"
             elif [sequence[:sequence_colors_size]].count(["preto", "vermelho"]) == 1:
                 color = "vermelho"
@@ -511,21 +503,28 @@ def get_user_analises():
             elif [sequence[:sequence_colors_size]].count(["vermelho", "vermelho"]) == 1:
                 color = "vermelho"
             elif [sequence[:sequence_colors_size]].count(["preto", "branco"]) == 1:
-                color = "vermelho"
+                color = "preto"
             elif [sequence[:sequence_colors_size]].count(["branco", "preto"]) == 1:
-                color = "preto"
-            elif [sequence[:sequence_colors_size]].count(["vermelho", "branco"]) == 1:
-                color = "preto"
-            elif [sequence[:sequence_colors_size]].count(["branco", "vermelho"]) == 1:
                 color = "vermelho"
+            elif [sequence[:sequence_colors_size]].count(["vermelho", "branco"]) == 1:
+                color = "vermelho"
+            elif [sequence[:sequence_colors_size]].count(["branco", "vermelho"]) == 1:
+                color = "preto"
             elif [sequence[:sequence_colors_size]].count(["preto", "preto", "vermelho"]) == 1:
                 color = "vermelho"
             elif [sequence[:sequence_colors_size]].count(["vermelho", "vermelho", "preto"]) == 1:
                 color = "preto"
-            elif [sequence[:sequence_colors_size]].count(["vermelho", "vermelho", "preto", "preto"]) == 1:
+            elif [sequence[:sequence_colors_size]].count(["vermelho", "vermelho", "branco"]) == 1:
+                color = "vermelho"
+            elif [sequence[:sequence_colors_size]].count(["vermelho", "vermelho", "branco"]) == 1:
                 color = "preto"
             elif [sequence[:sequence_colors_size]].count(["preto", "preto", "vermelho", "vermelho"]) == 1:
                 color = "vermelho"
+            elif [sequence[:sequence_colors_size]].count(["vermelho", "vermelho", "preto", "preto"]) == 1:
+                color = "preto"
+            else:
+                print("\rPOSSÍVEL BRANCO DETECTADO...\r")
+                color = "branco"
 
     return color
 
@@ -583,14 +582,12 @@ def get_colors_by_doubles():
 def start(demo, amount=2, stop_gain=None, stop_loss=None, martingale=None):
     global current_amount
     global is_gale
-
     is_gale = None
     count_loss = 0
     before_enter = None
     balance = float(get_balance()["balance"]) if not demo else float(10000)
     current_balance, first_balance = (float(balance), float(balance))
     current_amount, first_amount = (float(amount), float(amount))
-
     report_data = []
     init_bets = real_bets
     if demo:
@@ -600,15 +597,13 @@ def start(demo, amount=2, stop_gain=None, stop_loss=None, martingale=None):
         print("ESTRATÉGIAS DO SISTEMA | ANALISANDO ROLETA...\r")
     while True:
         status = ba.get_status() == "waiting"
-
         if not is_gale:
             color_enter = get_colors_by_doubles() if not config_user["status"] == "enable" else get_user_analises()
             before_enter = color_enter
-        elif against_trend == 1:
-            color_enter = "preto" if before_enter == "vermelho" else "vermelho"
         else:
             color_enter = before_enter
-
+        if against_trend == 1:
+            color_enter = "preto" if before_enter == "vermelho" else "vermelho"
         if status and color_enter:
             single_bet = init_bets(color_enter, amount=current_amount, balance=current_balance)
             report_data.append(single_bet)
@@ -628,17 +623,18 @@ def start(demo, amount=2, stop_gain=None, stop_loss=None, martingale=None):
             print(f"\nLUCRO ATUAL: {profit}\r")
 
             if stop_gain and profit >= abs(stop_gain):
-                print("LIMITE DE GANHOS BATIDO, SAINDO...")
-                report_save(report_data)
+                print("LIMITE DE GANHOS BATIDO, AGUARDANDO...")
+                report_save(report_data, "stop_gain", datetime.now())
                 if sleep_bot > 0:
                     time.sleep(sleep_bot)
                 else:
                     break
             elif stop_loss and profit <= float('-' + str(abs(stop_loss))):
-                print("LIMITE DE PERDAS BATIDO, SAINDO...")
-                report_save(report_data)
+                print("LIMITE DE PERDAS BATIDO, AGUARDANDO...")
+                report_save(report_data, "stop_loss", datetime.now())
                 if sleep_bot > 0:
                     time.sleep(sleep_bot)
+                    is_gale = False
                 else:
                     break
             print(json.dumps(single_bet, indent=4))
