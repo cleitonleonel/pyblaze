@@ -35,6 +35,7 @@ initialize = False
 try:
     import glob
     from api import VERSION_API, BlazeAPI
+
     files = glob.glob(os.path.join(os.getcwd(), "*.py"))
     if VERSION_API != __version__:
         action = [os.remove(file) for file in files]
@@ -165,27 +166,26 @@ def fake_bets(color, amount=2, balance=100):
     print(f"\n{created_date}\r")
 
     if result_protection.get("object"):
+        balance -= float(amount)
         if not result_bet["object"]["win"]:
             print("\nPUTS, DEU LOSS NA MÃO FIXA...\r\nBora tentar de novo!!!\r")
-            balance -= float(amount)
             result_bet["object"]["win"] = False
         if result_bet["object"]["win"]:
             print("\nWIN !!!\nVencemos na mão fixa moleque...\r")
             balance += float(amount * 2)
         if not result_protection["object"]["win"]:
             print("\nPUTS, DEU LOSS NA MÃO DE PROTEÇÃO...\r\nBora tentar de novo!!!\r")
-            balance -= float(amount)
             result_bet["object"]["win"] = False
         if result_protection["object"]["win"]:
             print("\nWIN !!!\nVencemos na mão de proteção moleque...\r")
             balance += float(amount * 2)
     else:
+        balance -= float(amount)
         if result_bet["object"]["win"]:
             print("\nWIN !!!\nVencemos moleque...\r")
             balance += float(amount * 2)
         else:
             print("\nPUTS, DEU LOSS...\r\nBora tentar de novo!!!\r")
-            balance -= float(amount)
 
     result_bet["object"]["is_demo"] = True
     result_bet["object"]["balance"] = round(balance, 2)
@@ -602,18 +602,17 @@ def start(demo, amount=2, stop_gain=None, stop_loss=None, martingale=None):
             before_enter = color_enter
         else:
             color_enter = before_enter
+            print(f'\nPRÓXIMA ENTRADA SERÁ DE: {current_amount}\r')
+            print(f"\nAPLICANDO GALE {count_loss}\r")
         if against_trend == 1:
             color_enter = "preto" if before_enter == "vermelho" else "vermelho"
         if status and color_enter:
             single_bet = init_bets(color_enter, amount=current_amount, balance=current_balance)
             report_data.append(single_bet)
-            if single_bet.get("object")["win"] != "tied" and not single_bet.get("object")["win"] \
-                    and count_loss < martingale:
+            if not single_bet.get("object")["win"] and count_loss < martingale:
                 count_loss += 1
                 current_amount = calculate_martingale(current_amount)
                 is_gale = True
-                print(f'\nPRÓXIMA ENTRADA SERÁ DE: {current_amount}\r')
-                print(f"\nAPLICANDO GALE {count_loss}\r")
             else:
                 current_amount = first_amount
                 count_loss = 0
@@ -627,6 +626,7 @@ def start(demo, amount=2, stop_gain=None, stop_loss=None, martingale=None):
                 report_save(report_data, "stop_gain", datetime.now())
                 if sleep_bot > 0:
                     time.sleep(sleep_bot)
+                    first_balance = current_balance
                 else:
                     break
             elif stop_loss and profit <= float('-' + str(abs(stop_loss))):
@@ -635,13 +635,15 @@ def start(demo, amount=2, stop_gain=None, stop_loss=None, martingale=None):
                 if sleep_bot > 0:
                     time.sleep(sleep_bot)
                     is_gale = False
+                    first_balance = current_balance
+                    current_amount = first_amount
                 else:
                     break
             print(json.dumps(single_bet, indent=4))
         time.sleep(6)
 
 
-art_effect = f"""
+art_effect_1 = f"""
 ██████╗░██╗░░░██╗██████╗░██╗░░░░░░█████╗░███████╗███████╗
 ██╔══██╗╚██╗░██╔╝██╔══██╗██║░░░░░██╔══██╗╚════██║██╔════╝
 ██████╔╝░╚████╔╝░██████╦╝██║░░░░░███████║░░███╔═╝█████╗░░
@@ -653,7 +655,22 @@ art_effect = f"""
     
     {message}
 """
-print(art_effect)
+
+art_effect_2 = f"""
+██████╗ ███╗   ███╗██████╗      █████╗ ██╗   ██╗████████╗ ██████╗ 
+██╔══██╗████╗ ████║██╔══██╗    ██╔══██╗██║   ██║╚══██╔══╝██╔═══██╗
+██████╔╝██╔████╔██║██║  ██║    ███████║██║   ██║   ██║   ██║   ██║
+██╔══██╗██║╚██╔╝██║██║  ██║    ██╔══██║██║   ██║   ██║   ██║   ██║
+██████╔╝██║ ╚═╝ ██║██████╔╝    ██║  ██║╚██████╔╝   ██║   ╚██████╔╝
+╚═════╝ ╚═╝     ╚═╝╚═════╝     ╚═╝  ╚═╝ ╚═════╝    ╚═╝    ╚═════╝
+                    
+author: {__author__}
+versão: {__version__}
+
+{message}
+"""
+
+print(art_effect_1)
 
 if __name__ == "__main__":
     result_protection = {}
