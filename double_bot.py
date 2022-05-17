@@ -83,7 +83,7 @@ def export_to_excel(file_name, data_frame, cols):
     :return:
     """
     df = pd.DataFrame(data_frame, columns=cols)
-    with pd.ExcelWriter(f'{file_name}.xlsx') as writer:
+    with pd.ExcelWriter(os.path.join("./", f'{file_name}.xlsx')) as writer:
         df.to_excel(writer, index=False)
         worksheet = writer.sheets['Sheet1']
         format_col_width(worksheet)
@@ -104,7 +104,7 @@ def report_save(data, data_type, data_created):
         data_rows = {item: [list(item["object"].values())[index] for item in data]
                      for index, item in enumerate(cols)}
         df = pd.DataFrame(data_rows, columns=cols)
-        df.to_csv(fr"{filename}", index=False, header=True)
+        df.to_csv(os.path.join("./", fr"{filename}"), index=False, header=True)
 
 
 def get_color(number):
