@@ -3,7 +3,7 @@ title = "Blazebot TOML Config"
 [project]
 name = "Blazebot"
 description = "Apostas automáticas na plataforma blaze.com"
-version = "0.0.1-trial"
+version = "0.0.1-trial"  # "0.0.1-trial"
 author = "Cleiton Leonel Creton"
 
 [authentication]
@@ -16,23 +16,24 @@ amount = 2.00
 # quantidade de martingale
 martingale = 2
 # limite de perdas
-stop_loss = 20
+stop_loss = 3
 # limite de ganhos
-stop_gain = 40
+stop_gain = 5
 # seguir tendência
 against_trend = 0  # 0 para não seguir a tendência ou 1 para seguir a tendência
 # tipo de aposta
 bet_type = "demo"  # demo ou real
+# bet_type = "real"  # demo ou real
 # define o tipo de arquivo para os relatórios
 report_type = "excel"  # excel, csv ou json
 # define o tempo de inatividade do bot após atingir um stop_loss ou stop_win
-sleep_bot = 3600  # 1 hora em segundos
+sleep_bot = 60  # 1 hora em segundos
 
 
 [strategies]
   #Por padrão a estratégia de usuário está desabilitada,
   #Para habilitar mude o status para enable.
-  status = "disable"  # "enable" # disable
+  status = "enable"  # "enable" # disable
 
   [strategies.sequencies]
     status = "enable"  # "enable" # disable
@@ -47,7 +48,7 @@ sleep_bot = 3600  # 1 hora em segundos
       status = "enable"  # "enable" # disable
       black = 3
       red = 3
-      white = 0
+      white = 1
 
     [strategies.sequencies.alternate]
       #Estratégia de sequência alternada:
@@ -60,7 +61,7 @@ sleep_bot = 3600  # 1 hora em segundos
       status = "enable"  # "enable" # disable
       black = 1
       red = 1
-      white = 0
+      white = 1
 
     [strategies.sequencies.repeat]
       #Limite de vezes que uma cor pode se repetir
@@ -75,7 +76,7 @@ sleep_bot = 3600  # 1 hora em segundos
       limit = 7
 
   [strategies.advanced]
-    status = "enable"  # "enable" # disable
+    status = "disable"  # "enable" # disable
 
     [strategies.advanced.protection]
       #Aplica uma estratégia de proteção a entrada corrente,

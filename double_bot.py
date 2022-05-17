@@ -47,6 +47,22 @@ except ImportError:
     message = "Para ter acesso a api, entre em contato pelo e-mail: cleiton.leonel@gmail.com"
 
 
+class Style:
+
+    os.system("")
+
+    BLACK = '\033[30m'
+    RED = '\033[31m'
+    GREEN = '\033[32m'
+    YELLOW = '\033[33m'
+    BLUE = '\033[34m'
+    MAGENTA = '\033[35m'
+    CYAN = '\033[36m'
+    WHITE = '\033[37m'
+    UNDERLINE = '\033[4m'
+    RESET = '\033[0m'
+
+
 def format_col_width(ws):
     """
 
@@ -678,17 +694,28 @@ if __name__ == "__main__":
     elif bet_type == "demo":
         is_demo = True
     else:
-        authenticate = ba.auth()
-        if authenticate.get("error"):
-            print(f'\rConta real selecionada, mas o erro abaixo foi constatado:')
-            print(f'{authenticate["error"]["message"]}\n')
-            action = input("Enter para usar o nosso simulador ou S para sair: \n").upper()
+        try:
+            authenticate = ba.auth()
+            if authenticate.get("error"):
+                print(f'\rConta real selecionada, mas o erro abaixo foi constatado:')
+                print(f'{authenticate["error"]["message"]}\n')
+                action = input("Enter para usar o nosso simulador ou S para sair: \n").upper()
+                if action == "S":
+                    print("Saindo...")
+                    sys.exit(0)
+                is_demo = True
+        except:
+            print(f"Conta real selecionada, mas o erro abaixo foi constatado:")
+            print(f"{Style.RED}Versão paga da api não encontrada!!!\033[0m")
+            print(f"{Style.RED}Para ter acesso a api completa, "
+                  f"entre em contato pelo e-mail: cleiton.leonel@gmail.com\033[0m")
+            action = input("Digite FREE para usar o nosso simulador grátis ou S para sair: \n").upper()
             if action == "S":
                 print("Saindo...")
                 sys.exit(0)
             is_demo = True
 
-    print("AGUARDE...")
+    print(f"{Style.YELLOW}AGUARDE...\033[0m")
 
     start(is_demo,
           amount=amount,
