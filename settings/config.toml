@@ -33,10 +33,37 @@ sleep_bot = 60  # 1 hora em segundos
 [strategies]
   #Por padrão a estratégia de usuário está desabilitada,
   #Para habilitar mude o status para enable.
-  status = "enable"  # "enable" # disable
+  status = "disable"  # "enable" # disable
+
+  [strategies.basic]
+    #Estratégia básica:
+    #Deve-se definir aqui a quantidade de cores
+    #repetidas em sequência que deseja analisar e a cor
+    #que se espera.
+    #EXEMPLOS:
+    #red = [preto, preto, preto] onde o vermelho espera uma determinada sequência
+    #black = [vermelho, vermelho, vermelho] onde o preto espera uma determinada sequência
+    status = "disable"  # "enable" # disable
+
+    result = [
+      { list = [
+          { "red" = ["preto", "preto", "preto"]},
+          { "red" = ["vermelho", "preto", "preto"]},
+          { "black" = ["preto", "vermelho", "vermelho"]},
+          { "black" = ["vermelho", "vermelho", "vermelho"]},
+          { "red" = ["preto", "preto", "vermelho"]},
+          { "black" = ["vermelho", "vermelho", "preto"]},
+          { "red" = ["vermelho", "vermelho", "preto", "preto"]},
+          { "black" = ["preto", "preto", "vermelho", "vermelho"]},
+          { "red" = ["preto", "vermelho", "preto"]},
+          { "black" = ["vermelho", "preto", "vermelho"]},
+          { "white" = ["vermelho", "vermelho", "branco", "vermelho"]},
+          { "white" = ["preto", "preto", "branco", "preto"]}
+      ]},
+    ]
 
   [strategies.sequencies]
-    status = "enable"  # "enable" # disable
+    status = "disable"  # "enable" # disable
 
     [strategies.sequencies.simple]
       #Estratégia de sequência simples:
@@ -45,7 +72,7 @@ sleep_bot = 60  # 1 hora em segundos
       #EXEMPLOS:
       #[preto, preto, preto, ...] = vermelho
       #[vermelho, vermelho, vermelho, ...] = preto
-      status = "enable"  # "enable" # disable
+      status = "disable"  # "enable" # disable
       black = 3
       red = 3
       white = 1
@@ -58,7 +85,7 @@ sleep_bot = 60  # 1 hora em segundos
       #[preto, vermelho, ...] = preto
       #[vermelho, preto, ...] = vermelho
       #[vermelho, vermelho, preto, preto, ...] = [vermelho, vermelho]
-      status = "enable"  # "enable" # disable
+      status = "disable"  # "enable" # disable
       black = 1
       red = 1
       white = 1

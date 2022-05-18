@@ -48,7 +48,6 @@ except ImportError:
 
 
 class Style:
-
     os.system("")
 
     BLACK = '\033[30m'
@@ -61,6 +60,10 @@ class Style:
     WHITE = '\033[37m'
     UNDERLINE = '\033[4m'
     RESET = '\033[0m'
+
+
+def replace_values(list_to_replace, item_to_replace, item_to_replace_with):
+    return [item_to_replace_with if item == item_to_replace else item for item in list_to_replace]
 
 
 def format_col_width(ws):
@@ -476,13 +479,24 @@ def get_user_analises():
     color = None
     last_doubles = ba.get_last_doubles()
     sequence_limit = config_user["sequencies"]["repeat"].get("limit")
+    sequence_basic_status = config_user["basic"].get("status")
     sequence_simple_status = config_user["sequencies"]["simple"].get("status")
     sequence_alternate_status = config_user["sequencies"]["alternate"].get("status")
+
+    if sequence_alternate_status == "disable" and sequence_simple_status == "disable" \
+            and sequence_basic_status == "disable":
+        print(f"\n\r{Style.YELLOW}NENHUMA OPÇÃO DE ESTRATÉGIA ESTÁ ATIVA !!!\n"
+              f"ACESSE O ARQUIVO DE CONFIGURAÇÃO 'config.toml' E ATIVE AO MENOS 1 OPÇÃO.\n\033[0m")
 
     if last_doubles:
         print("\rPOSSÍVEL SEQUÊNCIA DETECTADA...\r")
         double = [[item["color"], item["value"]] for item in last_doubles["items"]]
         sequence = [color[0] for color in double[:sequence_limit]]
+
+        colored_string = ', '.join([
+            f"\033[10;40m {item[1]} \033[m" if item[0] == "preto" else f"\033[10;41m {item[1]} \033[m" if item[0] == "vermelho"
+            else f"\033[10;47m {item[1]} \033[m" for item in double[:sequence_limit]])
+        print(f"\r{colored_string}\n")
 
         if sequence.count("vermelho") >= sequence_limit or \
                 sequence.count("preto") >= sequence_limit:
@@ -542,6 +556,16 @@ def get_user_analises():
                 print("\rPOSSÍVEL BRANCO DETECTADO...\r")
                 color = "branco"
 
+        if not color and sequence_basic_status == "enable":
+            basic_config_user = config_user["basic"]["result"]
+            for dicts in basic_config_user[0]["list"]:
+                if dicts.get("red") and dicts.get("red") == sequence[:len(dicts.get("red"))]:
+                    color = "vermelho"
+                elif dicts.get("black") and dicts.get("black") == sequence[:len(dicts.get("black"))]:
+                    color = "preto"
+                elif dicts.get("white") and dicts.get("white") == sequence[:len(dicts.get("white"))]:
+                    color = "branco"
+
     return color
 
 
@@ -590,6 +614,12 @@ def get_colors_by_doubles():
                     color = sequence[0][2]
         else:
             color = "branco"
+
+        colored_string = ', '.join([
+            f"\033[10;40m {item[1]} \033[m" if item[0] == "preto" else f"\033[10;41m {item[1]} \033[m" if item[0] == "vermelho"
+            else f"\033[10;47m {item[1]} \033[m" for item in double[:7]])
+        print(f"\r{colored_string}\n")
+
     else:
         print("ROLETA SEM UM PADRÃO DEFINIDO, AGUARDANDO PADRÃO...")
     return color
