@@ -7,6 +7,8 @@ Agora também é possível se autenticar na plataforma e fazer suas apostas via 
 
 # [PARA APOSTAR USE ESSE LINK](https://blaze.com/r/OPNoj6)
 
+# [SALA DE SINAIS NO TELEGRAM](https://t.me/doubles_and_crashs_free)
+
 # Para ter acesso a api ou caso necessite de mais recursos entre em contato comigo por algum dos meus contatos disponíveis:
 
 [![Facebook Badge](https://img.shields.io/badge/-Facebook-blue?style=for-the-badge&logo=Facebook&logoColor=white&link=https://github.com/cleitonleonel)](https://www.facebook.com/cleiton.creton.9/)
