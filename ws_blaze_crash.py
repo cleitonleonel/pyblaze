@@ -1,28 +1,20 @@
 import websocket
 import _thread
-import json
 import time
-
+import json
 
 WSS_BASE = "wss://api-v2.blaze.com"
 
 
-def get_color(number):
-    colors = {
-        0: "branco",
-        1: "vermelho",
-        2: "preto"
-    }
-    return colors.get(number, )
-
-
 def on_message(ws, message):
     global length
-    if "double.tick" in message:
+    if "crash.tick" in message:
         data = json.loads(message[2:])[1]["payload"]
-        if data["status"] == "complete" and length != len(message) + 1:
-            length = len(message) + 1
-            print(fr'Giro anterior {data["roll"]}, cor {get_color(data["color"])}')
+        if data["status"] == "complete" and length != len(message):
+            length = len(message)
+            print(f'\rCrash Point: {data["crash_point"]}, cor {"verde" if float(data["crash_point"]) > 2 else "preto"}')
+            if data["crash_point"] == "0" or data["crash_point"].endswith('.00') or float(data["crash_point"]) > 49:
+                print("\nPOSSÍVEL BRANCO NO DOUBLE...")
 
 
 def on_error(ws, error):
@@ -30,7 +22,8 @@ def on_error(ws, error):
 
 
 def on_close(ws, close_status_code, close_msg):
-    print("### closed ###")
+    time.sleep(2)
+    connect_websocket()
 
 
 def on_ping(ws, message):
@@ -44,7 +37,7 @@ def on_pong(ws, message):
 def on_open(ws):
     def run(*args):
         time.sleep(1)
-        message = '%d["cmd", {"id": "subscribe", "payload": {"room": "double_v2"}}]' % 421
+        message = '%d["cmd", {"id": "subscribe", "payload": {"room": "crash_v2"}}]' % 420
         ws.send(message)
         time.sleep(0.1)
         message = '%d["cmd", {"id": "subscribe", "payload": {"room": "chat_room_2"}}]' % 422
@@ -55,7 +48,6 @@ def on_open(ws):
 
 
 def connect_websocket():
-    # websocket.enableTrace(True)
     ws = websocket.WebSocketApp(f"{WSS_BASE}/replication/?EIO=3&transport=websocket",
                                 on_open=on_open,
                                 on_message=on_message,
