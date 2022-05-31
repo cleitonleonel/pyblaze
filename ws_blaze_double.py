@@ -30,7 +30,8 @@ def on_error(ws, error):
 
 
 def on_close(ws, close_status_code, close_msg):
-    print("### closed ###")
+    time.sleep(2)
+    connect_websocket()
 
 
 def on_ping(ws, message):
