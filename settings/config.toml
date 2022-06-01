@@ -15,11 +15,13 @@ password = "test123"
 amount = 2.00
 # quantidade de martingale
 martingale = 2
-# limite de perdas
+# quantidade de loss suportados, se atingido esse número o sistema para, visando proteger lucros
 stop_loss = 3
-# limite de ganhos
+# valor máximo de lucros suportados, se atingido esse número o sistema para, visando proteger lucros
 stop_gain = 5
 # seguir tendência
+multiplier = 2
+# multiplicador nos martingales
 against_trend = 0  # 0 para não seguir a tendência ou 1 para seguir a tendência
 # tipo de aposta
 bet_type = "demo"  # demo ou real
@@ -33,7 +35,7 @@ sleep_bot = 60  # 1 hora em segundos
 [strategies]
   #Por padrão a estratégia de usuário está desabilitada,
   #Para habilitar mude o status para enable.
-  status = "disable"  # "enable" # disable
+  status = "enable"  # "enable" # disable
 
   [strategies.basic]
     #Estratégia básica:
@@ -63,7 +65,7 @@ sleep_bot = 60  # 1 hora em segundos
     ]
 
   [strategies.sequencies]
-    status = "disable"  # "enable" # disable
+    status = "enable"  # "enable" # disable
 
     [strategies.sequencies.simple]
       #Estratégia de sequência simples:
@@ -72,7 +74,7 @@ sleep_bot = 60  # 1 hora em segundos
       #EXEMPLOS:
       #[preto, preto, preto, ...] = vermelho
       #[vermelho, vermelho, vermelho, ...] = preto
-      status = "disable"  # "enable" # disable
+      status = "enable"  # "enable" # disable
       black = 3
       red = 3
       white = 1
@@ -85,7 +87,7 @@ sleep_bot = 60  # 1 hora em segundos
       #[preto, vermelho, ...] = preto
       #[vermelho, preto, ...] = vermelho
       #[vermelho, vermelho, preto, preto, ...] = [vermelho, vermelho]
-      status = "disable"  # "enable" # disable
+      status = "enable"  # "enable" # disable
       black = 1
       red = 1
       white = 1

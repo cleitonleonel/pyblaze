@@ -27,6 +27,7 @@ amount = config.get("bets")["amount"]
 bet_type = config.get("bets")["bet_type"]
 stop_gain = config.get("bets")["stop_gain"]
 stop_loss = config.get("bets")["stop_loss"]
+multiplier = config.get("bets")["multiplier"]
 martingale = config.get("bets")["martingale"]
 report_type = config.get("bets")["report_type"]
 against_trend = config.get("bets")["against_trend"]
@@ -233,6 +234,7 @@ def real_bets(color, amount, balance):
             config_user["advanced"]["protection"]["hand"] == "reverse" and not is_gale:
         color = "preto" if color == "vermelho" else "vermelho"
         print(f"\nPROTEÇÃO DE {float(amount):.2f} R$ FEITA NO {color}\r")
+        time.sleep(2.5)
         ba.bets(color, amount)  # FAZ 1 ENTRADA COMO PROTEÇÃO NA PLATAFORMA.
         protection_thread = Thread(target=wait_result, args=[color, result_protection])
         protection_thread.start()
@@ -313,12 +315,7 @@ def calculate_martingale(enter):
     :param enter:
     :return:
     """
-    expected_profit = enter * 3
-    loss = float(enter)
-    while True:
-        if round(enter * 2, 2) > round(abs(loss) + expected_profit, 2):
-            return round(enter, 2)
-        enter += 0.50
+    return enter * multiplier
 
 
 def get_profile():
@@ -489,7 +486,7 @@ def get_user_analises():
               f"ACESSE O ARQUIVO DE CONFIGURAÇÃO 'config.toml' E ATIVE AO MENOS 1 OPÇÃO.\n\033[0m")
 
     if last_doubles:
-        print("\rPOSSÍVEL SEQUÊNCIA DETECTADA...\r")
+        print("\rPOSSÍVEL SEQUÊNCIA DETECTADA...\r\n")
         double = [[item["color"], item["value"]] for item in last_doubles["items"]]
         sequence = [color[0] for color in double[:sequence_limit]]
 
@@ -599,7 +596,7 @@ def get_colors_by_doubles():
             elif double[:5][-1][1] == 13:
                 color = "vermelho"
             elif fancy_test(sequence):
-                print("\rPOSSÍVEL SEQUÊNCIA DETECTADA...\r")
+                print("\rPOSSÍVEL SEQUÊNCIA DETECTADA...\r\n")
                 if sequence[0][0] == "preto" and sequence[0][-1] != "vermelho":
                     color = "vermelho"
                 elif sequence[0][0] == "vermelho" and sequence[0][-1] != "preto":
@@ -616,7 +613,8 @@ def get_colors_by_doubles():
             color = "branco"
 
         colored_string = ', '.join([
-            f"\033[10;40m {item[1]} \033[m" if item[0] == "preto" else f"\033[10;41m {item[1]} \033[m" if item[0] == "vermelho"
+            f"\033[10;40m {item[1]} \033[m" if item[0] == "preto"
+            else f"\033[10;41m {item[1]} \033[m" if item[0] == "vermelho"
             else f"\033[10;47m {item[1]} \033[m" for item in double[:7]])
         print(f"\r{colored_string}\n")
 
@@ -626,8 +624,8 @@ def get_colors_by_doubles():
 
 
 def start(demo, amount=2, stop_gain=None, stop_loss=None, martingale=None):
-    global current_amount
-    global is_gale
+    global count_win, count_loss, \
+        is_gale, count_martingale
     is_gale = None
     count_loss = 0
     before_enter = None
@@ -648,24 +646,32 @@ def start(demo, amount=2, stop_gain=None, stop_loss=None, martingale=None):
             before_enter = color_enter
         else:
             color_enter = before_enter
-            print(f'\nPRÓXIMA ENTRADA SERÁ DE: {current_amount}\r')
-            print(f"\nAPLICANDO GALE {count_loss}\r")
+            print(f'PRÓXIMA ENTRADA SERÁ DE: {current_amount}\r')
+            print(f"APLICANDO GALE {count_loss}\r")
         if against_trend == 1:
             color_enter = "preto" if before_enter == "vermelho" else "vermelho"
         if status and color_enter:
             single_bet = init_bets(color_enter, amount=current_amount, balance=current_balance)
             report_data.append(single_bet)
-            if not single_bet.get("object")["win"] and count_loss < martingale:
-                count_loss += 1
-                current_amount = calculate_martingale(current_amount)
-                is_gale = True
+            if count_martingale <= martingale:
+                if not single_bet["object"]["win"]:
+                    current_amount = calculate_martingale(current_amount)
+                    count_martingale += 1
+                    is_gale = True
+                else:
+                    print(f"\rWIN !!!")
+                    count_win += 1
+                    is_gale = False
+                    count_martingale = 0
             else:
-                current_amount = first_amount
-                count_loss = 0
+                print(f"\rLOSS !!!")
+                count_loss += 1
                 is_gale = False
+                count_martingale = 0
+
             current_balance = single_bet.get("object")["balance"]
             profit = round(current_balance - first_balance, 2)
-            print(f"\nLUCRO ATUAL: {profit}\r")
+            print(f"LUCRO ATUAL: {profit}\r")
 
             if stop_gain and profit >= abs(stop_gain):
                 print("LIMITE DE GANHOS BATIDO, AGUARDANDO...")
@@ -675,7 +681,7 @@ def start(demo, amount=2, stop_gain=None, stop_loss=None, martingale=None):
                     first_balance = current_balance
                 else:
                     break
-            elif stop_loss and profit <= float('-' + str(abs(stop_loss))):
+            elif count_loss >= stop_loss:
                 print("LIMITE DE PERDAS BATIDO, AGUARDANDO...")
                 report_save(report_data, "stop_loss", datetime.now())
                 if sleep_bot > 0:
@@ -685,7 +691,7 @@ def start(demo, amount=2, stop_gain=None, stop_loss=None, martingale=None):
                     current_amount = first_amount
                 else:
                     break
-            print(json.dumps(single_bet, indent=4))
+            # print(json.dumps(single_bet, indent=4))
         time.sleep(6)
 
 
@@ -705,11 +711,13 @@ art_effect = f"""
 print(art_effect)
 
 if __name__ == "__main__":
-    result_protection = {}
-    result_bet = {}
+    is_gale = False
+    count_win = 0
+    count_loss = 0
+    count_martingale = 0
     current_amount = None
-    is_gale = None
-    is_demo = False
+    result_bet = {}
+    result_protection = {}
     if date.today() - RLS_DATE >= timedelta(days=45):
         print("LICENÇA EXPIRADA ENTRE EM CONTATO COM \n"
               "O AUTOR DESSE PROJETO PARA ADQUIRIR \n"
