@@ -19,9 +19,9 @@ martingale = 2
 stop_loss = 3
 # valor máximo de lucros suportados, se atingido esse número o sistema para, visando proteger lucros
 stop_gain = 5
-# seguir tendência
-multiplier = 2
 # multiplicador nos martingales
+multiplier = 2
+# seguir tendência
 against_trend = 0  # 0 para não seguir a tendência ou 1 para seguir a tendência
 # tipo de aposta
 bet_type = "demo"  # demo ou real
