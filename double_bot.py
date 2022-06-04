@@ -624,7 +624,7 @@ def get_colors_by_doubles():
 
 
 def start(demo, amount=2, stop_gain=None, stop_loss=None, martingale=None):
-    global count_win, count_loss, \
+    global count_win, count_loss, current_amount, \
         is_gale, count_martingale
     is_gale = None
     count_loss = 0
@@ -647,27 +647,31 @@ def start(demo, amount=2, stop_gain=None, stop_loss=None, martingale=None):
         else:
             color_enter = before_enter
             print(f'PRÓXIMA ENTRADA SERÁ DE: {current_amount}\r')
-            print(f"APLICANDO GALE {count_loss}\r")
+            print(f"APLICANDO GALE {count_martingale}\r")
         if against_trend == 1:
             color_enter = "preto" if before_enter == "vermelho" else "vermelho"
         if status and color_enter:
-            single_bet = init_bets(color_enter, amount=current_amount, balance=current_balance)
-            report_data.append(single_bet)
             if count_martingale <= martingale:
+                single_bet = init_bets(color_enter, amount=current_amount, balance=current_balance)
+                report_data.append(single_bet)
                 if not single_bet["object"]["win"]:
                     current_amount = calculate_martingale(current_amount)
                     count_martingale += 1
-                    is_gale = True
+                    if count_martingale <= martingale:
+                        is_gale = True
+                    else:
+                        is_gale = False
                 else:
-                    print(f"\rWIN !!!")
                     count_win += 1
                     is_gale = False
                     count_martingale = 0
+                    current_amount = first_amount
             else:
                 print(f"\rLOSS !!!")
                 count_loss += 1
                 is_gale = False
                 count_martingale = 0
+                current_amount = first_amount
 
             current_balance = single_bet.get("object")["balance"]
             profit = round(current_balance - first_balance, 2)
@@ -676,19 +680,21 @@ def start(demo, amount=2, stop_gain=None, stop_loss=None, martingale=None):
             if stop_gain and profit >= abs(stop_gain):
                 print("LIMITE DE GANHOS BATIDO, AGUARDANDO...")
                 report_save(report_data, "stop_gain", datetime.now())
+                first_balance = current_balance
+                is_gale = False
+                count_loss = 0
                 if sleep_bot > 0:
                     time.sleep(sleep_bot)
-                    first_balance = current_balance
                 else:
                     break
             elif count_loss >= stop_loss:
                 print("LIMITE DE PERDAS BATIDO, AGUARDANDO...")
                 report_save(report_data, "stop_loss", datetime.now())
+                first_balance = current_balance
                 if sleep_bot > 0:
                     time.sleep(sleep_bot)
                     is_gale = False
-                    first_balance = current_balance
-                    current_amount = first_amount
+                    count_loss = 0
                 else:
                     break
             # print(json.dumps(single_bet, indent=4))
