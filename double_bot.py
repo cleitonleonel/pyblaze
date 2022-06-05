@@ -3,6 +3,7 @@ import sys
 import json
 import time
 import toml
+import string
 import numpy as np
 import pandas as pd
 from decimal import Decimal
@@ -67,15 +68,18 @@ def replace_values(list_to_replace, item_to_replace, item_to_replace_with):
     return [item_to_replace_with if item == item_to_replace else item for item in list_to_replace]
 
 
-def format_col_width(ws):
+def format_col_width(ws, rows, cols):
     """
 
     :param ws:
+    :param rows:
+    :param cols:
     :return:
     """
-    ws.column_dimensions['A'].width = 15
-    ws.column_dimensions['B'].width = 10
-    ws.column_dimensions['C'].width = 30
+    for index, col in enumerate(cols):
+        for item in rows:
+            letter = list(string.ascii_uppercase)[index]
+            ws.column_dimensions[letter].width = len(item[index]) + 5
 
 
 def export_to_excel(file_name, data_frame, cols):
@@ -90,7 +94,7 @@ def export_to_excel(file_name, data_frame, cols):
     with pd.ExcelWriter(os.path.join("./", f'{file_name}.xlsx')) as writer:
         df.to_excel(writer, index=False)
         worksheet = writer.sheets['Sheet1']
-        format_col_width(worksheet)
+        format_col_width(worksheet, data_frame, cols)
         writer.save()
 
 
