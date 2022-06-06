@@ -90,20 +90,33 @@ def export_to_excel(file_name, data_frame, cols):
     :param cols:
     :return:
     """
+    file_path = os.path.join(".", f'{file_name}.xlsx')
+    print(file_path)
     df = pd.DataFrame(data_frame, columns=cols)
-    with pd.ExcelWriter(os.path.join("./", f'{file_name}.xlsx')) as writer:
+    if not os.path.exists(file_path):
+        df.to_excel(file_path, index=False)
+    with pd.ExcelWriter(file_path, engine='openpyxl', mode='a', if_sheet_exists='overlay') as writer:
         df.to_excel(writer, index=False)
         worksheet = writer.sheets['Sheet1']
         format_col_width(worksheet, data_frame, cols)
         writer.save()
 
 
-def report_save(data, data_type, data_created):
-    filename = f"report-{data_type}-{data_created}"
+def report_save(report_type, data, data_type):
+    """
+
+    :param report_type:
+    :param data:
+    :param data_type:
+    :return:
+    """
+    filename = f"report-{data_type}-{datetime.now().strftime('%Y-%m-%d')}"
+    print(filename)
     if report_type == "json":
-        with open(os.path.join("./", f"{filename}.json"), "w") as report_json:
+        with open(os.path.join(".", f"{filename}.json"), "a") as report_json:
             report_json.write(json.dumps(data, indent=4))
     elif report_type == "excel":
+        print("VOU GERAR UM EXCEL...")
         cols = [list(item["object"].keys()) for item in data][0]
         rows = np.array([list(item["object"].values()) for item in data])
         export_to_excel(f"{filename}", rows, cols)
@@ -112,7 +125,7 @@ def report_save(data, data_type, data_created):
         data_rows = {item: [list(item["object"].values())[index] for item in data]
                      for index, item in enumerate(cols)}
         df = pd.DataFrame(data_rows, columns=cols)
-        df.to_csv(os.path.join("./", fr"{filename}"), index=False, header=True)
+        df.to_csv(os.path.join(".", fr"{filename}"), mode="a", index=False, header=True)
 
 
 def get_color(number):
@@ -683,7 +696,7 @@ def start(demo, amount=2, stop_gain=None, stop_loss=None, martingale=None):
 
             if stop_gain and profit >= abs(stop_gain):
                 print("LIMITE DE GANHOS BATIDO, AGUARDANDO...")
-                report_save(report_data, "stop_gain", datetime.now())
+                report_save(report_type, report_data, "stop_gain")
                 first_balance = current_balance
                 is_gale = False
                 count_loss = 0
@@ -693,7 +706,7 @@ def start(demo, amount=2, stop_gain=None, stop_loss=None, martingale=None):
                     break
             elif count_loss >= stop_loss:
                 print("LIMITE DE PERDAS BATIDO, AGUARDANDO...")
-                report_save(report_data, "stop_loss", datetime.now())
+                report_save(report_type, report_data, "stop_loss")
                 first_balance = current_balance
                 if sleep_bot > 0:
                     time.sleep(sleep_bot)
