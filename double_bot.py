@@ -91,7 +91,6 @@ def export_to_excel(file_name, data_frame, cols):
     :return:
     """
     file_path = os.path.join(".", f'{file_name}.xlsx')
-    print(file_path)
     df = pd.DataFrame(data_frame, columns=cols)
     if not os.path.exists(file_path):
         df.to_excel(file_path, index=False)
@@ -111,7 +110,6 @@ def report_save(report_type, data, data_type):
     :return:
     """
     filename = f"report-{data_type}-{datetime.now().strftime('%Y-%m-%d')}"
-    print(filename)
     if report_type == "json":
         with open(os.path.join(".", f"{filename}.json"), "a") as report_json:
             report_json.write(json.dumps(data, indent=4))
