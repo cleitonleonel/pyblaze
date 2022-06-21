@@ -172,7 +172,9 @@ def on_open(ws):
 
 
 def connect_websocket():
+    # websocket.enableTrace(True)
     ws = websocket.WebSocketApp(f"{WSS_BASE}/replication/?EIO=3&transport=websocket",
+                                header=ba.headers,
                                 on_open=on_open,
                                 on_message=on_message,
                                 on_close=on_close,
@@ -181,8 +183,11 @@ def connect_websocket():
 
     ws.run_forever(ping_interval=24,
                    ping_timeout=5,
-                   ping_payload="2")
+                   ping_payload="2",
+                   origin="https://blaze.com",
+                   host="api-v2.blaze.com")
 
 
 ba = BlazeAPI()
+
 connect_websocket()
