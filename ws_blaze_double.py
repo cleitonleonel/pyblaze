@@ -76,51 +76,10 @@ class BlazeAPI(Browser):
     def __init__(self, username=None, password=None):
         super().__init__()
         self.proxies = None
-        self.token = None
-        self.wallet_id = None
         self.username = username
         self.password = password
         self.set_headers()
         self.headers = self.get_headers()
-        self.auth()
-
-    def auth(self):
-        data = {
-            "username": self.username,
-            "password": self.password
-        }
-        self.headers["referer"] = f"{URL_API}/pt/?modal=auth&tab=login"
-        self.response = self.send_request("PUT",
-                                          f"{URL_API}/api/auth/password",
-                                          json=data,
-                                          headers=self.headers)
-
-        if not self.response.json().get("error"):
-            self.token = self.response.json()["access_token"]
-
-        return self.response.json()
-
-    def reconnect(self):
-        return self.auth()
-
-    def get_profile(self):
-        self.headers["authorization"] = f"Bearer {self.token}"
-        self.response = self.send_request("GET",
-                                          f"{URL_API}/api/users/me",
-                                          headers=self.headers)
-        return self.response.json()
-
-    def get_balance(self):
-        self.headers["authorization"] = f"Bearer {self.token}"
-        self.response = self.send_request("GET",
-                                          f"{URL_API}/api/wallets",
-                                          headers=self.headers)
-        if self.response.status_code == 502:
-            self.reconnect()
-            return self.get_balance()
-        elif self.response:
-            self.wallet_id = self.response.json()[0]["id"]
-        return self.response.json()
 
     def get_last_doubles(self):
         self.response = self.send_request("GET",
