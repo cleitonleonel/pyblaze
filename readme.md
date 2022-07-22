@@ -5,6 +5,8 @@
 Pyblaze possibilita o acesso a api do site [blaze](https://blaze.com) utilizando python, retornando os últimos resultados de crashs e doubles.
 Agora também é possível se autenticar na plataforma e fazer suas apostas via api.
 
+# [@BlazeAuto_bot](https://t.me/BlazeAuto_bot)
+
 # [PARA APOSTAR USE ESSE LINK](https://blaze.com/r/OPNoj6)
 
 # [SALA DE SINAIS NO TELEGRAM](https://t.me/doubles_and_crashs_free)
