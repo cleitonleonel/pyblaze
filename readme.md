@@ -6,7 +6,7 @@ Pyblaze possibilita o acesso a api do site [blaze](https://blaze.com) utilizando
 Agora também é possível se autenticar na plataforma e fazer suas apostas via api.
 
 # [@BlazeAuto_bot](https://t.me/BlazeAuto_bot)
-<img src="https://github.com/cleitonleonel/pyblaze/blob/master/blazeautobot.gif?raw=true" alt="QRCode Doação" width="600" height="400"/>
+<img src="https://github.com/cleitonleonel/pyblaze/blob/master/blazeautobot.gif?raw=true" alt="BlazeAutoBot" width="600" height="400"/>
 
 # [PARA APOSTAR USE ESSE LINK](https://blaze.com/r/OPNoj6)
 
