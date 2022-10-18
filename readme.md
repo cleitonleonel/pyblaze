@@ -43,7 +43,7 @@ Se não pode ou não deseja contribuir, peço que pelo menos dê uma ⭐ para o 
 git clone https://github.com/cleitonleonel/pyblaze.git
 cd pyblaze
 pip3 install -r requirements.txt
-python3 main.py
+python3 double_bot.py
 ```
 
 # Este projeto ajudou você?
