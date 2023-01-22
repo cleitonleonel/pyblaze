@@ -8,7 +8,6 @@ import numpy as np
 import pandas as pd
 from decimal import Decimal
 from threading import Thread
-from functools import reduce
 from datetime import datetime, timedelta, date
 
 config = toml.load('settings/config.toml')
@@ -17,7 +16,6 @@ __author__ = config['project']['author']
 __version__ = config['project']['version']
 
 BASE_DIR = os.getcwd()
-RLS_DATE = date(2022, 5, 1)
 
 authentication = config.get("authentication")
 config_user = config.get("strategies")
@@ -114,7 +112,6 @@ def report_save(report_type, data, data_type):
         with open(os.path.join(".", f"{filename}.json"), "a") as report_json:
             report_json.write(json.dumps(data, indent=4))
     elif report_type == "excel":
-        print("VOU GERAR UM EXCEL...")
         cols = [list(item["object"].keys()) for item in data][0]
         rows = np.array([list(item["object"].values()) for item in data])
         export_to_excel(f"{filename}", rows, cols)
@@ -146,7 +143,7 @@ def get_doubles(export=False):
     :param export:
     :return:
     """
-    last_doubles = ba.get_last_doubles(web_proxy=True)  # FAZ UM BUSCA PELOS ÚLTIMOS GIROS DOUBLES.
+    last_doubles = ba.get_last_doubles()  # FAZ UM BUSCA PELOS ÚLTIMOS GIROS DOUBLES.
     if last_doubles and export:
         keys = [key for key in last_doubles["items"][0].keys()]
         values = np.array([list(data.values()) for data in last_doubles["items"]])
@@ -160,7 +157,7 @@ def get_crashs(export=False):
     :param export:
     :return:
     """
-    last_crashs = ba.get_last_crashs(web_proxy=True)  # FAZ UM BUSCA PELOS ÚLTIMOS GIROS CRASHS.
+    last_crashs = ba.get_last_crashs()  # FAZ UM BUSCA PELOS ÚLTIMOS GIROS CRASHS.
     if last_crashs and export:
         keys = [key for key in last_crashs["items"][0].keys()]
         values = np.array([list(data.values()) for data in last_crashs["items"]])
@@ -242,7 +239,7 @@ def real_bets(color, amount, balance):
     result_bet = {}
     result_protection = {}
     print(f"\nAPOSTA DE {float(amount):.2f} R$ FEITA NO {color}\r")
-    ba.bets(color, amount)  # FAZ 1 ENTRADA REAL NA PLATAFORMA.
+    ba.double_bets(color, amount)  # FAZ 1 ENTRADA REAL NA PLATAFORMA.
     first_thread = Thread(target=wait_result, args=[color, result_bet])
     first_thread.start()
     if config_user["status"] == "enable" and config_user["advanced"]["status"] == "enable" and \
@@ -250,7 +247,7 @@ def real_bets(color, amount, balance):
         color = "preto" if color == "vermelho" else "vermelho"
         print(f"\nPROTEÇÃO DE {float(amount):.2f} R$ FEITA NO {color}\r")
         time.sleep(2.5)
-        ba.bets(color, amount)  # FAZ 1 ENTRADA COMO PROTEÇÃO NA PLATAFORMA.
+        ba.double_bets(color, amount)  # FAZ 1 ENTRADA COMO PROTEÇÃO NA PLATAFORMA.
         protection_thread = Thread(target=wait_result, args=[color, result_protection])
         protection_thread.start()
 
@@ -297,7 +294,6 @@ def wait_result(enter, bet):
     """
 
     :param bet:
-    :param bet_type:
     :param enter:
     :return:
     """
@@ -348,85 +344,18 @@ def get_balance():
 
     :return:
     """
-    balance = ba.get_balance()[0]  # OBTER INFORMAÇÕES DE SALDO DO USUÁRIO.
+    try:
+        balance = ba.get_balance()[0]  # OBTER INFORMAÇÕES DE SALDO DO USUÁRIO.
+    except:
+        balance = {
+            "balance": None
+        }
     # print(f'Saldo atual {Decimal(balance["balance"]):.2f}')
     return balance
 
 
 def get_timer():
     return datetime.now().strftime('%Y-%m-%d %H:%M')
-
-
-def all_info():
-    """
-
-    :return:
-    """
-    ba.get_all_results()  # IMPRIME TODOS OS RESULTADOS.
-
-
-def add_color(acc, users_ranking):
-    """
-
-    :param acc:
-    :param users_ranking:
-    :return:
-    """
-    color = users_ranking["color"]
-    acc[color] = acc.get(color) or {}
-    acc[color] = acc.get(color) or 0
-    acc[color] += 1
-    return acc
-
-
-def follow_ranks():
-    """
-
-    :return:
-    """
-    best_users = ba.get_ranking(**{"ranks": ["gold", "platinum"]})
-    dict_result = reduce(add_color, best_users, {})
-    if dict_result != {}:
-        if dict_result.get(2) > dict_result.get(1):
-            return "preto"
-        elif dict_result.get(1) > dict_result.get(2):
-            return "vermelho"
-    else:
-        follow_ranks()
-
-    return False
-
-
-def add_amount(acc, trends):
-    """
-
-    :param acc:
-    :param trends:
-    :return:
-    """
-    color, amount = trends["color"], trends["amount"]
-    acc[color] = acc.get(color) or {}
-    acc[color]["amount"] = acc[color].get("amount") or 0
-    acc[color]["amount"] += amount
-    return acc
-
-
-def follow_trends():
-    """
-
-    :return:
-    """
-    trends = ba.get_trends()
-    dict_result = reduce(add_amount, trends["bets"], {})
-    if dict_result != {}:
-        if dict_result.get(2)["amount"] > dict_result.get(1)["amount"]:
-            return "preto"
-        elif dict_result.get(1)["amount"] > dict_result.get(2)["amount"]:
-            return "vermelho"
-    else:
-        follow_trends()
-
-    return False
 
 
 def simple_doubles():
@@ -445,18 +374,6 @@ def simple_crashs():
     """
     last_crashs = ba.get_last_crashs()  # FAZ UM BUSCA PELOS ÚLTIMOS GIROS CRASHS.
     return last_crashs
-
-
-def get_max_min(acc, data_list):
-    color = data_list
-    acc[color] = acc.get(color) or {}
-    acc[color] = acc.get(color) or 0
-    acc[color] += 1
-    return acc
-
-
-def check_is_default(data_list):
-    return reduce(get_max_min, data_list, {})
 
 
 def fancy_test(data_list):
@@ -487,7 +404,7 @@ def fancy_test(data_list):
 
 
 def get_user_analises():
-    print("ESTRATÉGIAS DO USUÁRIO | ANALISANDO A ROLETA...\r")
+    print("\nESTRATÉGIAS DO USUÁRIO | ANALISANDO A ROLETA...\r")
     color = None
     last_doubles = ba.get_last_doubles()
     sequence_limit = config_user["sequencies"]["repeat"].get("limit")
@@ -506,7 +423,8 @@ def get_user_analises():
         sequence = [color[0] for color in double[:sequence_limit]]
 
         colored_string = ', '.join([
-            f"\033[10;40m {item[1]} \033[m" if item[0] == "preto" else f"\033[10;41m {item[1]} \033[m" if item[0] == "vermelho"
+            f"\033[10;40m {item[1]} \033[m" if item[0] == "preto" else f"\033[10;41m {item[1]} \033[m" if item[
+                                                                                                              0] == "vermelho"
             else f"\033[10;47m {item[1]} \033[m" for item in double[:sequence_limit]])
         print(f"\r{colored_string}\n")
 
@@ -638,13 +556,14 @@ def get_colors_by_doubles():
     return color
 
 
-def start(demo, amount=2, stop_gain=None, stop_loss=None, martingale=None):
+def start(demo):
     global count_win, count_loss, current_amount, \
         is_gale, count_martingale
     is_gale = None
     count_loss = 0
+    single_bet = {}
     before_enter = None
-    balance = float(get_balance()["balance"]) if not demo else float(10000)
+    balance = float(get_balance().get("balance")) if not demo and get_balance().get("balance") else float(10000)
     current_balance, first_balance = (float(balance), float(balance))
     current_amount, first_amount = (float(amount), float(amount))
     report_data = []
@@ -653,67 +572,67 @@ def start(demo, amount=2, stop_gain=None, stop_loss=None, martingale=None):
         print("AMBIENTE DE TESTES")
         init_bets = fake_bets
     if config_user["status"] == "disable":
-        print("ESTRATÉGIAS DO SISTEMA | ANALISANDO ROLETA...\r")
+        print("\nESTRATÉGIAS DO SISTEMA | ANALISANDO ROLETA...\r")
     while True:
-        status = ba.get_status() == "waiting"
-        if not is_gale:
-            color_enter = get_colors_by_doubles() if not config_user["status"] == "enable" else get_user_analises()
-            before_enter = color_enter
-        else:
-            color_enter = before_enter
-            print(f'PRÓXIMA ENTRADA SERÁ DE: {current_amount}\r')
-            print(f"APLICANDO GALE {count_martingale}\r")
-        if against_trend == 1:
-            color_enter = "preto" if before_enter == "vermelho" else "vermelho"
-        if status and color_enter:
-            if count_martingale <= martingale:
-                single_bet = init_bets(color_enter, amount=current_amount, balance=current_balance)
-                report_data.append(single_bet)
-                if not single_bet["object"]["win"]:
-                    current_amount = calculate_martingale(current_amount)
-                    count_martingale += 1
-                    if count_martingale <= martingale:
-                        is_gale = True
+        if ba.get_status() == "waiting":
+            if not is_gale:
+                color_enter = get_colors_by_doubles() if not config_user["status"] == "enable" else get_user_analises()
+                before_enter = color_enter
+            else:
+                color_enter = before_enter
+                print(f'PRÓXIMA ENTRADA SERÁ DE: {current_amount}\r')
+                print(f"APLICANDO GALE {count_martingale}\r")
+            if against_trend == 1:
+                color_enter = "preto" if before_enter == "vermelho" else "vermelho"
+            if color_enter:
+                if count_martingale <= martingale:
+                    single_bet = init_bets(color_enter, amount=current_amount, balance=current_balance)
+                    report_data.append(single_bet)
+                    if not single_bet["object"]["win"]:
+                        current_amount = calculate_martingale(current_amount)
+                        count_martingale += 1
+                        if count_martingale <= martingale:
+                            is_gale = True
+                        else:
+                            is_gale = False
                     else:
+                        count_win += 1
                         is_gale = False
+                        count_martingale = 0
+                        current_amount = first_amount
                 else:
-                    count_win += 1
+                    print(f"\rLOSS !!!")
+                    count_loss += 1
                     is_gale = False
                     count_martingale = 0
                     current_amount = first_amount
-            else:
-                print(f"\rLOSS !!!")
-                count_loss += 1
-                is_gale = False
-                count_martingale = 0
-                current_amount = first_amount
 
-            current_balance = single_bet.get("object")["balance"]
-            profit = round(current_balance - first_balance, 2)
-            print(f"LUCRO ATUAL: {profit}\r")
+                current_balance = single_bet.get("object")["balance"]
+                profit = round(current_balance - first_balance, 2)
+                print(f"LUCRO ATUAL: {profit}\r")
 
-            if stop_gain and profit >= abs(stop_gain):
-                print("LIMITE DE GANHOS BATIDO, AGUARDANDO...")
-                report_save(report_type, report_data, "stop_gain")
-                first_balance = current_balance
-                is_gale = False
-                count_loss = 0
-                if sleep_bot > 0:
-                    time.sleep(sleep_bot)
-                else:
-                    break
-            elif count_loss >= stop_loss:
-                print("LIMITE DE PERDAS BATIDO, AGUARDANDO...")
-                report_save(report_type, report_data, "stop_loss")
-                first_balance = current_balance
-                if sleep_bot > 0:
-                    time.sleep(sleep_bot)
+                if stop_gain and profit >= abs(stop_gain):
+                    print("LIMITE DE GANHOS BATIDO, AGUARDANDO...")
+                    report_save(report_type, report_data, "stop_gain")
+                    first_balance = current_balance
                     is_gale = False
                     count_loss = 0
-                else:
-                    break
-            # print(json.dumps(single_bet, indent=4))
-        time.sleep(6)
+                    if sleep_bot > 0:
+                        time.sleep(sleep_bot)
+                    else:
+                        break
+                elif count_loss >= stop_loss:
+                    print("LIMITE DE PERDAS BATIDO, AGUARDANDO...")
+                    report_save(report_type, report_data, "stop_loss")
+                    first_balance = current_balance
+                    if sleep_bot > 0:
+                        time.sleep(sleep_bot)
+                        is_gale = False
+                        count_loss = 0
+                    else:
+                        break
+                # print(json.dumps(single_bet, indent=4))
+            time.sleep(6)
 
 
 art_effect = f"""
@@ -733,26 +652,16 @@ print(art_effect)
 
 if __name__ == "__main__":
     is_gale = False
+    is_demo = bet_type == "demo"
     count_win = 0
     count_loss = 0
     count_martingale = 0
     current_amount = None
     result_bet = {}
-    result_protection = {}
-    if date.today() - RLS_DATE >= timedelta(days=45):
-        print("LICENÇA EXPIRADA ENTRE EM CONTATO COM \n"
-              "O AUTOR DESSE PROJETO PARA ADQUIRIR \n"
-              "A VERSÃO VITALÍCIA DO SISTEMA \n"
-              "\n"
-              ">>> cleiton.leonel@gmail.com <<<")
-        if getattr(sys, 'frozen', False):
-            os.remove(sys.argv[0])
-            sys.exit()
-    elif not initialize:
-        sys.exit(0)
-    elif bet_type == "demo":
-        is_demo = True
-    else:
+    print("ENTRE EM CONTATO COM O AUTOR DESSE PROJETO \n"
+          "PARA ADQUIRIR A VERSÃO VITALÍCIA DO SISTEMA. \n"
+          ">>> cleiton.leonel@gmail.com <<< \n")
+    if not is_demo:
         try:
             authenticate = ba.auth()
             if authenticate.get("error"):
@@ -776,9 +685,4 @@ if __name__ == "__main__":
 
     print(f"{Style.YELLOW}AGUARDE...\033[0m")
 
-    start(is_demo,
-          amount=amount,
-          stop_gain=stop_gain,
-          stop_loss=stop_loss,
-          martingale=martingale
-          )
+    start(demo=is_demo)
