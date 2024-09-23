@@ -5,13 +5,6 @@
 Pyblaze possibilita o acesso a api do site [blaze](https://blaze.com) utilizando python, retornando os últimos resultados de crashs e doubles.
 Agora também é possível se autenticar na plataforma e fazer suas apostas via api.
 
-# [@BlazeAuto_bot](https://t.me/BlazeAuto_bot)
-<img src="https://github.com/cleitonleonel/pyblaze/blob/master/blazeautobot.gif?raw=true" alt="BlazeAutoBot" width="600" height="400"/>
-
-# [PARA APOSTAR USE ESSE LINK](https://blaze.com/r/OPNoj6)
-
-# [SALA DE SINAIS NO TELEGRAM](https://t.me/doubles_and_crashs_free)
-
 # Para ter acesso a api ou caso necessite de mais recursos entre em contato comigo por algum dos meus contatos disponíveis:
 
 [![Facebook Badge](https://img.shields.io/badge/-Facebook-blue?style=for-the-badge&logo=Facebook&logoColor=white&link=https://github.com/cleitonleonel)](https://www.facebook.com/cleiton.creton.9/)
@@ -21,11 +14,6 @@ Agora também é possível se autenticar na plataforma e fazer suas apostas via 
 [![Telegram Badge](https://img.shields.io/badge/Telegram-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white&link=https://github.com/cleitonleonel)](https://t.me/CleitonLC)
 [![Gmail Badge](https://img.shields.io/badge/Gmail-D14836?style=for-the-badge&logo=gmail&logoColor=white&link=https://github.com/cleitonleonel)](cleiton.leonel@gmail.com)
 </h4>
-
-# _Testar a API_:
-Para testar a api e verificar a sua documentação acesse [_BlazeAPI_](https://github.com/cleitonleonel/blaze-api)
-
-# Precisa de um bot para telegram? uma sala de sinais crashs ou doubles? visite: [probots](https://webtelegram.com.br/)
 
 <img src="https://cdn-icons-png.flaticon.com/512/940/940794.png" alt="donation" width="200"/>
 
