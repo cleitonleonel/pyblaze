@@ -5,8 +5,6 @@
 Pyblaze possibilita o acesso a api do site [blaze](https://blaze.com) utilizando python, retornando os últimos resultados de crashs e doubles.
 Agora também é possível se autenticar na plataforma e fazer suas apostas via api.
 
-# Para ter acesso a api ou caso necessite de mais recursos entre em contato comigo por algum dos meus contatos disponíveis:
-
 [![Facebook Badge](https://img.shields.io/badge/-Facebook-blue?style=for-the-badge&logo=Facebook&logoColor=white&link=https://github.com/cleitonleonel)](https://www.facebook.com/cleiton.creton.9/)
 [![Instagram Badge](https://img.shields.io/badge/-instagram-red?style=for-the-badge&logo=instagram&logoColor=white&link=https://github.com/cleitonleonel)](https://www.instagram.com/cleiton.creton.9/)
 [![Linkedin Badge](https://img.shields.io/badge/-Linkedin-blue?style=for-the-badge&logo=Linkedin&logoColor=white&link=https://github.com/cleitonleonel)](https://www.linkedin.com/in/cleiton-leonel-creton-331138167/)
